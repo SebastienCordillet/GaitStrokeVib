@@ -35,7 +35,7 @@ def zeni(acqGait, folder:str, footStrikeOffset=0, footOffOffset=0, **kwargs):
 
 
     """
-    folder=folder[2:4]+folder[0:2]+folder[4:9]
+    folder=folder[2:4]+folder[0:2]
     # folder="BJ"
     acqGait.ClearEvents()
 

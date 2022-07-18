@@ -48,55 +48,55 @@ import pyCGM2; LOGGER = pyCGM2.LOGGER
 
      
 
-Folders = os.listdir("database/raw")
-# print(Folders)
-for folder in Folders:                   # folder is a folder in /raw. EXEMPLE: folder=MJ06
-    if not os.path.exists(f"database/newRaw/{folder}"):
+# Folders = os.listdir("database/raw")
+# # print(Folders)
+# for folder in Folders:                   # folder is a folder in /raw. EXEMPLE: folder=MJ06
+#     if not os.path.exists(f"database/newRaw/{folder}"):
         
-        os.makedirs(f"database/newRaw/{folder}")
-        Files=os.listdir(f"database/raw/{folder}")
-        # print(Files)
-        for filename in Files:             # filename is a file. EXEMPLE:Take 2014-09-29 02_57_20 PM.4.c3d 
+#         os.makedirs(f"database/newRaw/{folder}")
+#         Files=os.listdir(f"database/raw/{folder}")
+#         # print(Files)
+#         for filename in Files:             # filename is a file. EXEMPLE:Take 2014-09-29 02_57_20 PM.4.c3d 
         
-            # c3d to acq with btk:
-            acq=btkTools.smartReader(f"database/raw/{folder}/{filename}")
+#             # c3d to acq with btk:
+#             acq=btkTools.smartReader(f"database/raw/{folder}/{filename}")
             
     
-            #new acq with events
-            acqGait,state = newEventDetector.zeni(acq,folder,footStrikeOffset=0, footOffOffset=0)
+#             #new acq with events
+#             acqGait,state = newEventDetector.zeni(acq,folder,footStrikeOffset=0, footOffOffset=0)
     
-        #new acq to new c3d
-            if not os.path.exists(f"database/newRaw/{folder}/{filename}"):
-                event_data_path= f"database/newRaw/{folder}/{filename}"
-                btkTools.smartWriter(acqGait, event_data_path)
-            else:
-                LOGGER.logger.error(f"database/newRaw/{folder}/{filename} already exists")
+#         #new acq to new c3d
+#             if not os.path.exists(f"database/newRaw/{folder}/{filename}"):
+#                 event_data_path= f"database/newRaw/{folder}/{filename}"
+#                 btkTools.smartWriter(acqGait, event_data_path)
+#             else:
+#                 LOGGER.logger.error(f"database/newRaw/{folder}/{filename} already exists")
 
-    else:
-        LOGGER.logger.error(f"database/newRaw/{folder} already exists")
-
-
+#     else:
+#         LOGGER.logger.error(f"database/newRaw/{folder} already exists")
 
 
 
-folder="21BJ"  
-Files=os.listdir("database/raw/21BJ")
-for filename in Files:             
-    # c3d to acq with btk:
-    acq=btkTools.smartReader(f"database/raw/{folder}/{filename}")
+
+
+# folder="21BJ"  
+# Files=os.listdir("database/raw/21BJ")
+# for filename in Files:             
+#     # c3d to acq with btk:
+#     acq=btkTools.smartReader(f"database/raw/{folder}/{filename}")
     
-    #new acq with events
-    acqGait,state = newEventDetector.zeni(acq,folder,footStrikeOffset=0, footOffOffset=0)
+#     #new acq with events
+#     acqGait,state = newEventDetector.zeni(acq,folder,footStrikeOffset=0, footOffOffset=0)
     
-    #new acq to new c3d
-    if not os.path.exists(f"database/newRaw/{folder}/{filename}"):
-        event_data_path= f"database/newRaw/{folder}/{filename}"
-        btkTools.smartWriter(acqGait, event_data_path)
-    else:
-        LOGGER.logger.error(f"database/newRaw/{folder}/{filename} already exists")
+#     #new acq to new c3d
+#     if not os.path.exists(f"database/newRaw/{folder}/{filename}"):
+#         event_data_path= f"database/newRaw/{folder}/{filename}"
+#         btkTools.smartWriter(acqGait, event_data_path)
+#     else:
+#         LOGGER.logger.error(f"database/newRaw/{folder}/{filename} already exists")
 
-else:
-    LOGGER.logger.error(f"database/newRaw/{folder} already exists")
+# else:
+#     LOGGER.logger.error(f"database/newRaw/{folder} already exists")
 
 
 
@@ -136,12 +136,11 @@ else:
 
 
 
-# folder="06MJ:RBWT"
-# print(folder)
-# folder=folder[2:4]+folder[0:2]+folder[4:9]
-# print(folder)
+folder="06MJ"
 
+folder=folder[2:4]+folder[0:2]
 
+print(folder)
 
 
 
