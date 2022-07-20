@@ -58,15 +58,17 @@ for folder in Folders:
             
             df=pst.getEvents(f"database/newRawVF/{folder}/{file}").sort_values(by = ['time'])    
             markers=Markers.from_c3d(f"database/newRawVF/{folder}/{file}",channels)
-                
+            
+            """normalized_WalkAxis ans Walk Index"""
+            normalized_walkAxis, walkIndex = pst.walkAxis(markers)
                 
             """Step length"""
-            leftStepLength , rightStepLength = pst.stepLength(df,markers)
+            leftStepLength , rightStepLength = pst.stepLength(df,markers,walkIndex)
                 
             
             
             """Step wide"""
-            leftStepWide , rightStepWide = pst.stepWide(df,markers)
+            leftStepWide , rightStepWide = pst.stepWide(df,markers,walkIndex)
            
             
             """Step Angle"""
@@ -89,20 +91,21 @@ for folder in Folders:
            
             
          
-            df= pd.DataFrame({'left step length': leftStepLength,
-                                'right step length': rightStepLength,
-                                'left step wide' : leftStepWide,
-                                'right step wide': rightStepWide,
-                                'left step angle' : leftStepAngle,
-                                'right step angle': rightStepAngle,
-                                'left strike cycle time' : leftStrikeCycleTime,
-                                'right strike cycle time' : rightStrikeCycleTime,
-                                'left Oscillation time' : leftOscillationTime,
-                                'right Oscillation time' : rightOscillationTime,
-                                'left simple support time' : leftSSTime,
-                                'right simple support time' : rightSSTime,
-                                'left double support time' : leftDSTime,
-                                'right double support time' : rightDSTime},
+            df= pd.DataFrame({'walk index' : walkIndex,
+                              'left step length': leftStepLength,
+                              'right step length': rightStepLength,
+                              'left step wide' : leftStepWide,
+                              'right step wide': rightStepWide,
+                              'left step angle' : leftStepAngle,
+                              'right step angle': rightStepAngle,
+                              'left strike cycle time' : leftStrikeCycleTime,
+                              'right strike cycle time' : rightStrikeCycleTime,
+                              'left Oscillation time' : leftOscillationTime,
+                              'right Oscillation time' : rightOscillationTime,
+                              'left simple support time' : leftSSTime,
+                              'right simple support time' : rightSSTime,
+                              'left double support time' : leftDSTime,
+                              'right double support time' : rightDSTime},
                              index=[f"{folder}/{file}"]
                              
                               )

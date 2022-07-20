@@ -170,7 +170,7 @@ def Test(df,filename):
 # channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
 # markers=Markers.from_c3d(filename,channels)
 
-def stepLength(df,markers):
+def stepLength(df,markers,walkIndex):
     Yprogression=markers[1]
     
     Leftstep=[]
@@ -183,8 +183,8 @@ def stepLength(df,markers):
                 t=df.iloc[k,3]
                 yRHEE=Yprogression[dict(channel=1, time=t-Yprogression.first_frame)].to_numpy()
                 yLHEE=Yprogression[dict(channel=3, time=t-Yprogression.first_frame)].to_numpy()
-                steplength=abs(yRHEE-yLHEE)
-                Rightstep.append(steplength)
+                steplength=yRHEE-yLHEE
+                Rightstep.append(steplength*walkIndex)
             
         if df.iloc[k,1]=='Left':
             if df.iloc[k,0]=='Foot Strike':
@@ -192,8 +192,8 @@ def stepLength(df,markers):
                 t=df.iloc[k,3]
                 yRHEE=Yprogression[dict(channel=1, time=t-Yprogression.first_frame)].to_numpy()
                 yLHEE=Yprogression[dict(channel=3, time=t-Yprogression.first_frame)].to_numpy()
-                steplength=abs(yLHEE-yRHEE)
-                Leftstep.append(steplength)
+                steplength=yLHEE-yRHEE
+                Leftstep.append(steplength*walkIndex)
                 
     return np.mean(Leftstep), np.mean(Rightstep)
 
@@ -327,7 +327,7 @@ def walkAxis(markers):
 # channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
 # markers=Markers.from_c3d(filename,channels)       
     
-def stepWide(df, markers):
+def stepWide(df, markers,walkIndex):
     
     Xprogression=markers[0]
     LeftstepWide=[]
@@ -340,8 +340,8 @@ def stepWide(df, markers):
                 t=df.iloc[k,3]
                 xRHEE=Xprogression[dict(channel=1, time=t-Xprogression.first_frame)].to_numpy()
                 xLHEE=Xprogression[dict(channel=3, time=t-Xprogression.first_frame)].to_numpy()
-                stepwide=abs(xRHEE-xLHEE)
-                RightstepWide.append(stepwide)
+                stepwide=xRHEE-xLHEE
+                RightstepWide.append(stepwide*walkIndex)
             
         if df.iloc[k,1]=='Left':
             if df.iloc[k,0]=='Foot Strike':
@@ -349,8 +349,8 @@ def stepWide(df, markers):
                 t=df.iloc[k,3]
                 xRHEE=Xprogression[dict(channel=1, time=t-Xprogression.first_frame)].to_numpy()
                 xLHEE=Xprogression[dict(channel=3, time=t-Xprogression.first_frame)].to_numpy()
-                stepwide=abs(xLHEE-xRHEE)
-                LeftstepWide.append(stepwide)
+                stepwide=xLHEE-xRHEE
+                LeftstepWide.append(stepwide*walkIndex)
                 
     return np.mean(LeftstepWide), np.mean(RightstepWide)
     
