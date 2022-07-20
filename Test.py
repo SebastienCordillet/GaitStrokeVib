@@ -8,6 +8,7 @@ Created on Wed Jul 13 14:03:00 2022
 import pst 
 import os
 
+
 """Test"""
 
 # filename="database/newRawVF/06MJ/Take 2014-09-29 02_57_20 PM.4.c3d"
@@ -72,14 +73,14 @@ import os
 #     Files=os.listdir(f"database/newRawVF/{folder}")
 #     for file in Files:
 #         print(file)
-#         print(pst.doubleSupport(f"database/newRawVF/{folder}/{file}"))
+#         print(pst.doubleSupportTime(f"database/newRawVF/{folder}/{file}"))
 
 """Walk Axis"""
 
 # filename="database/newRawVF/06MJ/Take 2014-09-29 02_57_20 PM.4.c3d"
-# folder="06MJ"
+# channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
 
-# print(pst.walkAxis(filename,folder))
+# print(pst.walkAxis(filename,channels))
 
 """Step Wide"""
 
@@ -91,7 +92,8 @@ import os
 
 """stepAngle"""
 
-# filename="database/newRawVF/06MJ/Take 2014-09-29 02_57_20 PM.4.c3d"
-# folder="06MJ"
+filename="database/newRawVF/06MJ/Take 2014-09-29 02_57_20 PM.4.c3d"
+channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
 
-# print(pst.stepAngle(filename,folder))
+
+print(pst.stepAngle(filename,channels))

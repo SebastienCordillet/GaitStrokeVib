@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import os
 import pst
+from pyomeca import Markers
 
 # df=pd.DataFrame(data={
 #     'step length': steplength,
@@ -20,6 +21,8 @@ import pst
 #     'double support time' : simplesupporttime
     
 
+   
+channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
 
 
 
@@ -52,43 +55,38 @@ for folder in Folders:
         
         Files=os.listdir(f"database/newRawVF/{folder}")
         for file in Files:
+            
+            df=pst.getEvents(f"database/newRawVF/{folder}/{file}").sort_values(by = ['time'])    
+            markers=Markers.from_c3d(f"database/newRawVF/{folder}/{file}",channels)
                 
                 
             """Step length"""
-            leftStepLength , rightStepLength = pst.stepLength(f"database/newRawVF/{folder}/{file}",channels)
+            leftStepLength , rightStepLength = pst.stepLength(df,markers)
                 
-            # LeftStepLength.append(leftStepLength)
-            # RightStepLength.append(rightStepLength)
+            
             
             """Step wide"""
-            leftStepWide , rightStepWide = pst.stepWide(f"database/newRawVF/{folder}/{file}",channels)
-            # LeftStepWide.append(leftStepWide)
-            # RightStepWide.append(rightStepWide)
+            leftStepWide , rightStepWide = pst.stepWide(df,markers)
+           
             
             """Step Angle"""
-            leftStepAngle , rightStepAngle = pst.stepAngle(f"database/newRawVF/{folder}/{file}",channels)
-            # LeftStepAngle.append(leftStepAngle)
-            # RightStepAngle.append(rightStepAngle)
+            leftStepAngle , rightStepAngle = pst.stepAngle(df,markers)
+         
             
             """Cycle Time"""
-            leftStrikeCycleTime , rightStrikeCycleTime = pst.cycleTime(f"database/newRawVF/{folder}/{file}")
-            # LeftStrikeCycleTime.append(leftStrikeCycleTime)
-            # RightStrikeCycleTime.append(rightStrikeCycleTime)
-            
+            leftStrikeCycleTime , rightStrikeCycleTime = pst.cycleTime(df)
+           
             """Oscillation Time"""
-            leftOscillationTime , rightOscillationTime = pst.oscillationTime(f"database/newRawVF/{folder}/{file}")
-            # LeftStrikeCycleTime.append(leftOscillationTime)
-            # RightStrikeCycleTime.append(rightOscillationTime)
+            leftOscillationTime , rightOscillationTime = pst.oscillationTime(df)
+         
             
             """Simple Support Time"""
-            leftSSTime , rightSSTime = pst.simpleSupportTime(f"database/newRawVF/{folder}/{file}")
-            # LeftSSTime.append(leftSSTime)
-            # RightSSTime.append(rightSSTime)
+            leftSSTime , rightSSTime = pst.simpleSupportTime(df)
+          
             
             """Double Support Time"""
-            leftDSTime , rightDSTime = pst.doubleSupportTime(f"database/newRawVF/{folder}/{file}")
-            # LeftDSTime.append(leftDSTime)
-            # RightDSTime.append(rightDSTime)
+            leftDSTime , rightDSTime = pst.doubleSupportTime(df)
+           
             
          
             df= pd.DataFrame({'left step length': leftStepLength,
@@ -110,7 +108,7 @@ for folder in Folders:
                               )
             
             
-            df.to_json(f"database/newRawjson/{folder}/json/{file}.json")
+            df.to_json(f"database/newRawjson/{folder}/{file}.json")
             
         
         

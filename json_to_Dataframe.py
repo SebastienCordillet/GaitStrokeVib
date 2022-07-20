@@ -12,9 +12,9 @@ df = pd.DataFrame()
 Folders = os.listdir("database/newRawjson")
 
 for folder in Folders:
-    Files=os.listdir(f"database/newRawjson/{folder}/json")
+    Files=os.listdir(f"database/newRawjson/{folder}")
     for file in Files:
-        df = pd.concat([df, pd.read_json(f"database/newRawjson/{folder}/json/{file}")])
+        df = pd.concat([df, pd.read_json(f"database/newRawjson/{folder}/{file}")])
 
 
 

@@ -8,7 +8,7 @@ from math import *
 import pandas as pd
 import numpy as np
 import os
-import btk
+
 import pyCGM2
 from pyCGM2.Tools import btkTools
 import csv
@@ -127,8 +127,10 @@ def getEvents(filec3d, part='EVENT'):
 #                     pass  
 #         print(f"{filename} done")
     
-def Test(filename):
-        df=getEvents(filename).sort_values(by = ['time'])
+# df=getEvents(filename).sort_values(by = ['time'])
+
+def Test(df,filename):
+        
     
         n=df.shape[0]
         for k in range(n-1):
@@ -164,11 +166,13 @@ def Test(filename):
     
     
             
-    
+# df=getEvents(filename).sort_values(by = ['time'])    
+# channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
+# markers=Markers.from_c3d(filename,channels)
 
-def stepLength(filename,channels):
-    Yprogression=Markers.from_c3d(filename,channels)[1]
-    df=getEvents(filename).sort_values(by = ['time'])
+def stepLength(df,markers):
+    Yprogression=markers[1]
+    
     Leftstep=[]
     Rightstep=[]
     n=df.shape[0]
@@ -194,11 +198,13 @@ def stepLength(filename,channels):
     return np.mean(Leftstep), np.mean(Rightstep)
 
 
+# df=getEvents(filename).sort_values(by = ['time'])    
+# channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
+# markers=Markers.from_c3d(filename,channels)
 
-
-def cycleTime(filename):
+def cycleTime(df):
     """moyenne de la durée d'un cycle de marche du fichier c3d"""
-    df=getEvents(filename).sort_values(by = ['time'])
+    
     
     moyCycleLeftStrike = np.mean(df.query("label=='Foot Strike' & Context=='Left'").time.to_numpy()[1:]-df.query("label=='Foot Strike' & Context=='Left'").time.to_numpy()[0:-1])
     moyCycleRightStrike = np.mean(df.query("label=='Foot Strike' & Context=='Right'").time.to_numpy()[1:]-df.query("label=='Foot Strike' & Context=='Right'").time.to_numpy()[0:-1])
@@ -206,9 +212,11 @@ def cycleTime(filename):
     return moyCycleLeftStrike , moyCycleRightStrike
         
 
+
+# df=getEvents(filename).sort_values(by = ['time'])    
         
-def oscillationTime(filename):
-    df = getEvents(filename).sort_values(by = ['time'])
+def oscillationTime(df):
+    
     LFS = df.query("label=='Foot Strike' & Context=='Left'")
     nLFS=LFS.shape[0]
     LFO = df.query("label=='Foot Off' & Context=='Left'")
@@ -247,14 +255,16 @@ def oscillationTime(filename):
 
 
 
-def simpleSupportTime(filename):
-    rightSupportTime , leftSupportTime = oscillationTime(filename)
+def simpleSupportTime(df):
+    rightSupportTime , leftSupportTime = oscillationTime(df)
     
     return leftSupportTime , rightSupportTime
     
+   
+# df=getEvents(filename).sort_values(by = ['time'])    
+
+def doubleSupportTime(df):
     
-def doubleSupportTime(filename):
-    df = getEvents(filename).sort_values(by = ['time'])
     LFS = df.query("label=='Foot Strike' & Context=='Left'")
     nLFS=LFS.shape[0]
     LFO = df.query("label=='Foot Off' & Context=='Left'")
@@ -270,31 +280,56 @@ def doubleSupportTime(filename):
     nR=min(nRFS,nLFO)
     
     if df.iloc[0,0]=='Foot Strike':
-        leftDoubleSupportTime = np.mean(RFO.time.to_numpy()[0:nL]-LFS.time.to_numpy()[0:nL])
-        rightDoubleSupportTime = np.mean(LFO.time.to_numpy()[0:nR]-RFS.time.to_numpy()[0:nR])
-        
+        if df.iloc[0,1]=='Left':
+            leftDoubleSupportTime = np.mean(RFO.time.to_numpy()[0:nL]-LFS.time.to_numpy()[0:nL])
+            rightDoubleSupportTime = np.mean(LFO.time.to_numpy()[0:nR]-RFS.time.to_numpy()[0:nR])
+        else:
+            leftDoubleSupportTime = np.mean(RFO.time.to_numpy()[0:nL]-LFS.time.to_numpy()[0:nL])
+            rightDoubleSupportTime = np.mean(LFO.time.to_numpy()[0:nR]-RFS.time.to_numpy()[0:nR])
+       
     else: 
-        leftDoubleSupportTime = np.mean(RFO.time.to_numpy()[0:nL]-LFS.time.to_numpy()[0:nL])
-        rightDoubleSupportTime = np.mean(LFO.time.to_numpy()[1:nR]-RFS.time.to_numpy()[0:nR-1])
+        if df.iloc[0,1]=='Left':
+            leftDoubleSupportTime = np.mean(RFO.time.to_numpy()[0:nL]-LFS.time.to_numpy()[0:nL])
+            rightDoubleSupportTime = np.mean(LFO.time.to_numpy()[1:nR]-RFS.time.to_numpy()[0:nR-1])
+        else:
+            leftDoubleSupportTime = np.mean(RFO.time.to_numpy()[1:nL]-LFS.time.to_numpy()[0:nL-1])
+            rightDoubleSupportTime = np.mean(LFO.time.to_numpy()[0:nR]-RFS.time.to_numpy()[0:nR])
+      
+
+
 
     return leftDoubleSupportTime , rightDoubleSupportTime
-        
-        
-        
-def walkAxis(filename,channels):
+    
+
+# df=getEvents(filename).sort_values(by = ['time'])    
+# channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
+# markers=Markers.from_c3d(filename,channels)
+
+def walkAxis(markers):
    
-    m = Markers.from_c3d(filename,channels)
     
     
-    X=(m[0][4].to_numpy()+m[0][5].to_numpy()+m[0][6].to_numpy()+m[0][7].to_numpy())/4
-    Y=(m[1][4].to_numpy()+m[1][5].to_numpy()+m[1][6].to_numpy()+m[1][7].to_numpy())/4
     
-    return X,Y
+    X=(markers[0][4].to_numpy()+markers[0][5].to_numpy()+markers[0][6].to_numpy()+markers[0][7].to_numpy())/4
+    Y=(markers[1][4].to_numpy()+markers[1][5].to_numpy()+markers[1][6].to_numpy()+markers[1][7].to_numpy())/4
+    n=min(len(X),len(Y))
+    startPoint=np.array([X[1],Y[1]])
+    endPoint=np.array([X[n-1],Y[n-1]])
+    if Y[1]<Y[n-1]:
+        walkIndex=1
+    else:
+        walkIndex=-1
+    walkAxis=endPoint-startPoint
+    normalized_walkAxis = walkAxis / np.sqrt(np.sum(walkAxis**2))
+    return normalized_walkAxis, walkIndex
            
-        
-def stepWide(filename, channels):
-    df=getEvents(filename).sort_values(by = ['time'])
-    Xprogression=Markers.from_c3d(filename,channels)[1]
+# df=getEvents(filename).sort_values(by = ['time'])    
+# channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
+# markers=Markers.from_c3d(filename,channels)       
+    
+def stepWide(df, markers):
+    
+    Xprogression=markers[0]
     LeftstepWide=[]
     RightstepWide=[]
     n=df.shape[0]
@@ -319,12 +354,14 @@ def stepWide(filename, channels):
                 
     return np.mean(LeftstepWide), np.mean(RightstepWide)
     
-    
+# df=getEvents(filename).sort_values(by = ['time'])    
+# channels=['MJ06:RTOE','MJ06:RHEE','MJ06:LTOE','MJ06:LHEE','MJ06:RFWT','MJ06:RBWT','MJ06:LFWT','MJ06:LBWT']
+# markers=Markers.from_c3d(filename,channels)
 
-def stepAngle(filename,channels):
-    df=getEvents(filename).sort_values(by = ['time'])
-    m = Markers.from_c3d(filename,channels)
-    XAxis , YAxis = walkAxis(filename,channels)
+def stepAngle(df,markers):
+    
+    
+    normalized_walkAxis, walkIndex = walkAxis(markers)
     LeftFootAngle=[]
     RightFootAngle=[]
     n=df.shape[0]
@@ -332,49 +369,51 @@ def stepAngle(filename,channels):
         if df.iloc[k,0]=='Foot Off':
             if df.iloc[k,1]=='Right':
                 tOff=df.iloc[k,3]
-                tStrike=df.iloc[k+1,3]
-                xLHEE=m[0][dict(channel=3, time=tOff-m[0].first_frame)].to_numpy()
-                xLTOE=m[0][dict(channel=2, time=tOff-m[0].first_frame)].to_numpy()
-                yLHEE=m[1][dict(channel=3, time=tOff-m[1].first_frame)].to_numpy()
-                yLTOE=m[1][dict(channel=2, time=tOff-m[1].first_frame)].to_numpy()
+               
+                xLHEE=markers[0][dict(channel=3, time=tOff-markers[0].first_frame)].to_numpy()
+                xLTOE=markers[0][dict(channel=2, time=tOff-markers[0].first_frame)].to_numpy()
+                yLHEE=markers[1][dict(channel=3, time=tOff-markers[1].first_frame)].to_numpy()
+                yLTOE=markers[1][dict(channel=2, time=tOff-markers[1].first_frame)].to_numpy()
 
                 leftFootVector=np.array([xLTOE-xLHEE, yLTOE-yLHEE])
                 
-                axisVector=np.array([XAxis[tStrike-m[0].first_frame]-XAxis[tOff-m[0].first_frame],YAxis[tStrike-m[1].first_frame]-YAxis[tOff-m[1].first_frame]])
                 
-                axisVector_norm = np.sqrt(sum(axisVector**2))     
+                normalized_walkAxis_norm = np.sqrt(sum(normalized_walkAxis**2))     
   
-                proj_of_leftFootVector_on_axisVector = (np.dot(leftFootVector, axisVector)/axisVector_norm**2)*axisVector
+                proj_of_leftFootVector_on_normalized_walkAxis = (np.dot(leftFootVector, normalized_walkAxis)/normalized_walkAxis_norm**2)*normalized_walkAxis
                 
                 leftFootVector_norm = np.sqrt(sum(leftFootVector**2))
-                proj_of_leftFootVector_on_axisVector_norm = np.sqrt(sum(proj_of_leftFootVector_on_axisVector**2))
+                proj_of_leftFootVector_on_normalized_walkAxis_norm = np.sqrt(sum(proj_of_leftFootVector_on_normalized_walkAxis**2))
   
-                angle=acos(proj_of_leftFootVector_on_axisVector_norm/leftFootVector_norm)*(360/(2*pi))
+                angle=acos(proj_of_leftFootVector_on_normalized_walkAxis_norm/leftFootVector_norm)*(360/(2*pi))
 
                
                 LeftFootAngle.append(abs(angle))
-            
+        
             if df.iloc[k,1]=='Left':
                 tOff=df.iloc[k,3]
-                tStrike=df.iloc[k+1,3]
-                xRHEE=m[0][dict(channel=1, time=tOff-m[0].first_frame)].to_numpy()
-                xRTOE=m[0][dict(channel=0, time=tOff-m[0].first_frame)].to_numpy()
-                yRHEE=m[1][dict(channel=1, time=tOff-m[1].first_frame)].to_numpy()
-                yRTOE=m[1][dict(channel=0, time=tOff-m[1].first_frame)].to_numpy()
+                
+                xRHEE=markers[0][dict(channel=1, time=tOff-markers[0].first_frame)].to_numpy()
+                xRTOE=markers[0][dict(channel=0, time=tOff-markers[0].first_frame)].to_numpy()
+                yRHEE=markers[1][dict(channel=1, time=tOff-markers[1].first_frame)].to_numpy()
+                yRTOE=markers[1][dict(channel=0, time=tOff-markers[1].first_frame)].to_numpy()
+                
+                rightFootVector=np.array([xRTOE-xRHEE, yRTOE-yRHEE])
 
-                leftFootVector=np.array([xRTOE-xRHEE, yRTOE-yRHEE])
-                axisVector=np.array([XAxis[tStrike-m[0].first_frame]-XAxis[tOff-m[0].first_frame],YAxis[tStrike-m[1].first_frame]-YAxis[tOff-m[1].first_frame]])
-                
-                axisVector_norm = np.sqrt(sum(axisVector**2))     
-  
-                proj_of_leftFootVector_on_axisVector = (np.dot(leftFootVector, axisVector)/axisVector_norm**2)*axisVector
-                
-                leftFootVector_norm = np.sqrt(sum(leftFootVector**2))
-                
-                proj_of_leftFootVector_on_axisVector_norm = np.sqrt(sum(proj_of_leftFootVector_on_axisVector**2))
-  
-                angle=acos(proj_of_leftFootVector_on_axisVector_norm/leftFootVector_norm)*(360/(2*pi))
+               
+               
+                normalized_walkAxis_norm = np.sqrt(sum(normalized_walkAxis**2))     
+ 
+                proj_of_rightFootVector_on_normalized_walkAxis = (np.dot(rightFootVector, normalized_walkAxis)/normalized_walkAxis_norm**2)*normalized_walkAxis
+               
+                rightFootVector_norm = np.sqrt(sum(rightFootVector**2))
+                proj_of_rightFootVector_on_normalized_walkAxis_norm = np.sqrt(sum(proj_of_rightFootVector_on_normalized_walkAxis**2))
+     
+                angle=acos(proj_of_rightFootVector_on_normalized_walkAxis_norm/rightFootVector_norm)*(360/(2*pi))
 
+              
+               
+                
                
                 RightFootAngle.append(abs(angle))
                 

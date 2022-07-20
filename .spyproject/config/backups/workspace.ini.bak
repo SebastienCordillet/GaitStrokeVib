@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = empty-project-type
-recent_files = ['pst.py', 'Test.py']
+recent_files = ['Test.py', 'pst.py', 'main.py', 'json_to_Dataframe.py', 'dataFrame.py', 'pyomeca\\analogs.py']
 
 [main]
 version = 0.2.0
